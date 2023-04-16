@@ -1,0 +1,156 @@
+package com.bigtreetc.recycling.aws.client.dynamodb;
+
+import com.bigtreetc.recycling.aws.client.AwsClientException;
+import java.util.Optional;
+import java.util.function.Consumer;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.BatchWriteItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.*;
+
+@RequiredArgsConstructor
+@Slf4j
+public class AwsDynamoDBClient {
+
+  @NonNull final DynamoDbClient dynamoDbClient;
+
+  /**
+   * クエリを実行します。
+   *
+   * @param clazz
+   * @param requestConsumer
+   * @param <T>
+   * @return
+   */
+  public <T> PageIterable<T> query(
+      String tableName, Consumer<QueryEnhancedRequest.Builder> requestConsumer, Class<T> clazz) {
+    log.debug("query: tableName={}", tableName);
+
+    try {
+      val enhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(dynamoDbClient).build();
+      val table = enhancedClient.table(tableName, TableSchema.fromBean(clazz));
+      return table.query(requestConsumer);
+    } catch (Exception e) {
+      throw new AwsClientException("failed to query.", e);
+    }
+  }
+
+  /**
+   * ハッシュキーでアイテムを取得します。
+   *
+   * @param tableName
+   * @param hashKey
+   * @param clazz
+   * @return
+   */
+  public <T> Optional<T> getItem(String tableName, String hashKey, Class<T> clazz) {
+    log.debug("getItem: tableName={}, hashKey={}", tableName, hashKey);
+
+    try {
+      val enhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(dynamoDbClient).build();
+      val table = enhancedClient.table(tableName, TableSchema.fromBean(clazz));
+      val key = Key.builder().partitionValue(hashKey).build();
+      val ret = table.getItem(key);
+      return Optional.of(ret);
+    } catch (ResourceNotFoundException e) {
+      return Optional.empty();
+    } catch (Exception e) {
+      throw new AwsClientException("failed to getItem.", e);
+    }
+  }
+
+  /**
+   * ハッシュキー、レンジキーでアイテムを取得します。
+   *
+   * @param tableName
+   * @param hashKey
+   * @param rangeKey
+   * @param clazz
+   * @return
+   */
+  public <T> Optional<T> getItem(
+      String tableName, String hashKey, String rangeKey, Class<T> clazz) {
+    log.debug("getItem: tableName={}, hashKey={}, rangeKey={}", tableName, hashKey, rangeKey);
+
+    try {
+      val enhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(dynamoDbClient).build();
+      val table = enhancedClient.table(tableName, TableSchema.fromBean(clazz));
+      val key = Key.builder().partitionValue(hashKey).sortValue(rangeKey).build();
+      val ret = table.getItem(key);
+      return Optional.of(ret);
+    } catch (ResourceNotFoundException e) {
+      return Optional.empty();
+    } catch (Exception e) {
+      throw new AwsClientException("failed to getItem.", e);
+    }
+  }
+
+  /**
+   * アイテムを保存します。
+   *
+   * @param item
+   * @return
+   */
+  public <T> T putItem(String tableName, T item, Class<T> clazz) {
+    log.debug("putItem: tableName={}", tableName);
+
+    try {
+      val enhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(dynamoDbClient).build();
+      val table = enhancedClient.table(tableName, TableSchema.fromBean(clazz));
+      table.putItem(item);
+    } catch (Exception e) {
+      throw new AwsClientException("failed to putItem.", e);
+    }
+
+    return item;
+  }
+
+  /**
+   * アイテムを保存します。
+   *
+   * @param item
+   * @return
+   */
+  public <T> T deleteItem(String tableName, T item, Class<T> clazz) {
+    log.debug("deleteItem: tableName={}", tableName);
+
+    try {
+      val enhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(dynamoDbClient).build();
+      val table = enhancedClient.table(tableName, TableSchema.fromBean(clazz));
+      val key = table.keyFrom(item);
+      log.info(
+          "deleteItem: tableName={}, hashKey={}", tableName, key.partitionKeyValue().toString());
+
+      table.deleteItem(item);
+    } catch (Exception e) {
+      throw new AwsClientException("failed to deleteItem.", e);
+    }
+
+    return item;
+  }
+
+  /**
+   * アイテムを一括処理します。
+   *
+   * @param requestConsumer
+   * @return
+   */
+  public void batchWriteItem(Consumer<BatchWriteItemEnhancedRequest.Builder> requestConsumer) {
+    log.debug("batchWriteItem: start");
+
+    try {
+      val enhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(dynamoDbClient).build();
+      enhancedClient.batchWriteItem(requestConsumer);
+      log.info("batchWriteItem: end");
+
+    } catch (Exception e) {
+      throw new AwsClientException("failed to batchWriteItem.", e);
+    }
+  }
+}
