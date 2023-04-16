@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    default: test
+    active: test
+
+####
+# アプリケーションの設定
+application:
+  aws:
+    s3:
+      endpoint: http://localhost:4566
+      bucketName: java-recycling-bin-bucket
+    ecs:
+      endpoint: http://localhost:4566
