@@ -1,0 +1,64 @@
+version: '3.4'
+
+networks:
+  # This is the default network. It is used for normal inter-container
+  # communications.
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+  # This special network is configured so that the local metadata
+  # service can bind to the specific IP address that ECS uses
+  # in production
+  credentials_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "169.254.170.0/24"
+          gateway: 169.254.170.1
+
+services:
+  # This container simulates IAM and STS and vends (fake) credentials
+  localstack:
+    image: localstack/localstack
+    environment:
+      DEFAULT_REGION: ap-northeast-1
+      DATA_DIR: /tmp/localstack/data
+      HOSTNAME_EXTERNAL: host.docker.internal
+    networks:
+      - default
+    ports:
+      - '4592:4592'
+      - '4593:4593'
+      - '4566:4566'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/localstack:/tmp/localstack
+
+  # This container vends credentials to your containers by obtaining (fake)
+  # credentials from the localstack container. Take note that a real AWS account
+  # is not necessary when using these simulated endpoints.
+  ecs-local-endpoints:
+    # The Amazon ECS Local Container Endpoints Docker Image
+    image: amazon/amazon-ecs-local-container-endpoints
+    depends_on:
+      - localstack
+    volumes:
+      # Mount /var/run so we can access docker.sock and talk to Docker
+      - /var/run:/var/run
+    environment:
+      # The simulated IAM and STS endpoints will accept any access key
+      # and secret key. These values may simply be left as dummy values.
+      - AWS_ACCESS_KEY_ID=accessKey
+      - AWS_REGION=ap-northeast-1
+      - AWS_SECRET_ACCESS_KEY=secretAccessKey
+      - IAM_CUSTOM_ENDPOINT=http://localstack:4593
+      - STS_CUSTOM_ENDPOINT=http://localstack:4592
+    networks:
+      # This is connected to both networks. This makes Local Endpoints
+      # accessible on the well-known IP address, and it enables communication
+      # with the localstack container.
+      credentials_network:
+        # This special IP address is recognized by the AWS SDKs and AWS CLI
+        ipv4_address: "169.254.170.2"
+      default:
