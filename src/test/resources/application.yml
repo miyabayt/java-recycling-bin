@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    default: test
+    active: test
+
+####
+# アプリケーションの設定
+application:
+  aws:
+    s3:
+      endpoint: http://localhost:4566
+      bucketName: java-recycling-bin-bucket
+    dymamodb:
+      endpoint: http://localhost:4566
+    sqs:
+      endpoint: http://localhost:4566
+      maxNumberOfMessages: 10
+      visibilityTimeoutSeconds: 0
+      waitTimeSeconds: 0
