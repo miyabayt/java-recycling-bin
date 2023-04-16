@@ -2,7 +2,7 @@ plugins {
     id "java"
     id "idea"
     id "org.springframework.boot" version "${springBootVersion}"
-    id "com.avast.gradle.docker-compose" version "0.16.11"
+    id "com.avast.gradle.docker-compose" version "0.16.12"
     id "com.diffplug.spotless" version "${spotlessVersion}"
     id "jacoco"
 }
