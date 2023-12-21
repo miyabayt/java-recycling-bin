@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import software.amazon.awssdk.auth.credentials.*;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.ecs.EcsClient;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -113,5 +114,16 @@ public class AwsClientConfig {
       Environment environment, RestTemplateBuilder restTemplateBuilder) {
     val restTemplate = restTemplateBuilder.build();
     return new AwsEcsMetadataClient(environment, restTemplate);
+  }
+
+  @Bean
+  public CognitoIdentityProviderClient cognitoClient(
+      AwsCredentialsProvider awsCredentialsProvider) {
+    val region = Region.AP_NORTHEAST_1;
+    val builder =
+        CognitoIdentityProviderClient.builder()
+            .credentialsProvider(awsCredentialsProvider)
+            .region(region);
+    return builder.build();
   }
 }

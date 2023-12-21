@@ -72,6 +72,7 @@ dependencies {
     implementation "software.amazon.awssdk:ses"
     implementation "software.amazon.awssdk:iam"
     implementation "software.amazon.awssdk:sts"
+    implementation "software.amazon.awssdk:cognitoidentityprovider"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.security:spring-security-test"

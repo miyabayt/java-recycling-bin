@@ -1,5 +1,6 @@
 package com.bigtreetc.recycling;
 
+import com.bigtreetc.recycling.aws.client.cognito.AwsCognitoIdpClient;
 import com.bigtreetc.recycling.aws.client.dynamodb.AwsDynamoDBClient;
 import com.bigtreetc.recycling.aws.client.ecs.AwsEcsClient;
 import com.bigtreetc.recycling.aws.client.s3.AwsS3Client;
@@ -9,6 +10,7 @@ import com.bigtreetc.recycling.aws.client.sqs.AwsSqsConfigProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.ecs.EcsClient;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -42,5 +44,10 @@ public class TestConfig {
   @Bean
   public AwsSesClient awsSesClient(SesClient sesClient) {
     return new AwsSesClient(sesClient);
+  }
+
+  @Bean
+  public AwsCognitoIdpClient awsCognitoIdpClient(CognitoIdentityProviderClient cognitoIdpClient) {
+    return new AwsCognitoIdpClient(cognitoIdpClient);
   }
 }
