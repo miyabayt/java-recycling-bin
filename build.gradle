@@ -2,7 +2,9 @@ plugins {
     id "java"
     id "idea"
     id "org.springframework.boot" version "${springBootVersion}"
-    id "com.diffplug.spotless" version "${spotlessVersion}"
+    id "org.owasp.dependencycheck" version "9.0.7"
+    id "com.diffplug.spotless" version "6.23.3"
+    id "com.github.ben-manes.versions" version "0.50.0"
     id "jacoco"
 }
 
@@ -40,7 +42,7 @@ spotless {
 
 sourceCompatibility = "17"
 [compileJava, compileTestJava]*.options*.encoding = "UTF-8"
-[compileJava, compileTestJava]*.options*.compilerArgs = ["-Xlint:all"]
+[compileJava, compileTestJava]*.options*.compilerArgs = ["-parameters", "-Xlint:all"]
 
 dependencies {
     compileOnly "org.projectlombok:lombok"
@@ -60,10 +62,11 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
 
-    implementation "commons-io:commons-io:2.11.0"
-    implementation "org.modelmapper:modelmapper:3.1.0"
+    implementation "commons-io:commons-io:2.15.1"
+    implementation "org.modelmapper:modelmapper:3.2.0"
+    implementation "commons-codec:commons-codec"
 
-    implementation platform("software.amazon.awssdk:bom:${awsSdkVersion}")
+    implementation platform("software.amazon.awssdk:bom:2.22.3")
     implementation "software.amazon.awssdk:s3"
     implementation "software.amazon.awssdk:ecs"
     implementation "software.amazon.awssdk:dynamodb"
@@ -78,7 +81,7 @@ dependencies {
     testImplementation "org.springframework.security:spring-security-test"
     testImplementation "com.h2database:h2"
 
-    testImplementation "org.flywaydb.flyway-test-extensions:flyway-spring-test:7.0.0"
+    testImplementation "org.flywaydb.flyway-test-extensions:flyway-spring-test:9.5.0"
     testImplementation "org.springframework.boot:spring-boot-testcontainers"
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation "org.testcontainers:localstack"
