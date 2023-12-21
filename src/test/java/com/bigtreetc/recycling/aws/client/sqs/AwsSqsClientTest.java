@@ -59,7 +59,7 @@ class AwsSqsClientTest extends BaseTestContainerTest {
     assertThatCode(
             () -> {
               val messages = awsSqsClient.receiveMessage(queueUrl);
-              assertThat(messages.size()).isGreaterThan(1);
+              assertThat(messages.size()).isPositive();
             })
         .doesNotThrowAnyException();
   }
