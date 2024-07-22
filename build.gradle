@@ -81,7 +81,7 @@ dependencies {
     testImplementation "org.springframework.security:spring-security-test"
     testImplementation "com.h2database:h2"
 
-    testImplementation "org.flywaydb.flyway-test-extensions:flyway-spring-test:9.5.0"
+    testImplementation "org.flywaydb.flyway-test-extensions:flyway-spring-test:10.0.0"
     testImplementation "org.springframework.boot:spring-boot-testcontainers"
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation "org.testcontainers:localstack"
