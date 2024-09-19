@@ -62,7 +62,7 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
 
-    implementation "commons-io:commons-io:2.15.1"
+    implementation "commons-io:commons-io:2.17.0"
     implementation "org.modelmapper:modelmapper:3.2.1"
     implementation "commons-codec:commons-codec"
 
